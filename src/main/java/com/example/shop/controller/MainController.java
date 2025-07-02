@@ -25,7 +25,7 @@ public class MainController {
                        Optional<Integer> page, Model model) {
 
         Pageable pageable = PageRequest.of(
-                page.isPresent() ? page.get() : 1, 6
+                page.orElse(0), 6
         );
 
         log.info("MainController: pageable: {}", itemSearchDto);

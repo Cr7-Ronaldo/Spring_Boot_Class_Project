@@ -1,23 +1,26 @@
 package com.example.shop.controller; // 컨트롤러 클래스가 위치한 패키지 경로
 
 import com.example.shop.dto.OrderDto; // 주문 정보를 담는 DTO 클래스 import
+import com.example.shop.dto.OrderHisDto;
 import com.example.shop.service.OrderService; // 주문 비즈니스 로직을 처리하는 서비스 클래스 import
 import jakarta.validation.Valid; // 요청 데이터의 유효성 검사를 위한 어노테이션
 import lombok.RequiredArgsConstructor; // final 필드 생성자 자동 생성 어노테이션
 import lombok.extern.slf4j.Slf4j; // 로깅 기능 제공 어노테이션
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus; // HTTP 상태 코드 사용을 위한 클래스
 import org.springframework.http.ResponseEntity; // HTTP 응답 데이터를 담는 객체
 import org.springframework.stereotype.Controller; // Spring MVC 컨트롤러임을 나타내는 어노테이션
 import org.springframework.ui.Model; // 뷰(View)로 데이터 전달 시 사용하는 객체 (이 코드에서는 사용되지 않음)
 import org.springframework.validation.BindingResult; // 유효성 검사 결과를 담는 객체
 import org.springframework.validation.FieldError; // 필드 단위 유효성 오류 정보를 담는 객체
-import org.springframework.web.bind.annotation.PostMapping; // POST 요청을 처리하기 위한 어노테이션
-import org.springframework.web.bind.annotation.RequestBody; // 요청 본문을 자바 객체로 매핑하는 어노테이션
-import org.springframework.web.bind.annotation.RequestParam; // 요청 파라미터 값을 가져오는 어노테이션 (이 코드에서는 사용되지 않음)
-import org.springframework.web.bind.annotation.ResponseBody; // 반환값을 HTTP 응답 본문으로 보내도록 지정하는 어노테이션
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal; // 로그인한 사용자의 정보를 담는 객체
 import java.util.List; // 리스트 자료형 import
+import java.util.Optional;
 
 @Controller // 해당 클래스를 Spring MVC에서 컨트롤러로 인식하도록 지정
 @RequiredArgsConstructor // final 필드에 대해 생성자를 자동 생성 (orderService 주입)
@@ -56,4 +59,36 @@ public class OrderController {
 
         return new ResponseEntity<Long>(orderId, HttpStatus.OK); // 주문 성공 시 주문 ID와 200 OK 상태 반환
     }
+
+    @GetMapping(value = {"/orders","/orders/{page}"})
+    public String orderHist(@PathVariable("page") Optional<Integer> page,
+                            Principal principal,
+                            Model model) {
+        Pageable pageable =
+                PageRequest.of(page.isPresent()?page.get():0, 4);
+
+        Page<OrderHisDto> orderHisDtoList =
+                orderService.getOrderList(principal.getName(), pageable);
+
+        model.addAttribute("orders", orderHisDtoList);
+        model.addAttribute("page", pageable.getPageNumber());
+        model.addAttribute("maxPage", 5);
+
+        return "order/orderHist";
+    }
+
+
+    //주문취소
+    @PostMapping(value = "/order/{orderId}/cancel")
+    public @ResponseBody ResponseEntity<?> cancelOrder(@PathVariable("orderId") Long orderId,
+                                                       Principal principal) {
+        if(!orderService.validateOrder(orderId, principal.getName())){
+            return new ResponseEntity<String>("주문 취소 권한이 없습니다.", HttpStatus.FORBIDDEN);
+        }
+        orderService.cancelOrder(orderId);
+
+        return new ResponseEntity<Long>(orderId, HttpStatus.OK);
+
+    }
+
 }

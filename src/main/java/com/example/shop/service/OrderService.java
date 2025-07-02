@@ -27,6 +27,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,12 +101,16 @@ public class OrderService {
         // 2. 총 주문 수 조회 (페이지 계산용)
         Long totalcount = orderRepository.countOrder(email);
 
+
         // 3. 최종 반환할 주문 이력 DTO 리스트 생성
         List<OrderHisDto> orderHisDtoList = new ArrayList<>();
 
         // 4. 각 주문에 대해 DTO 변환 작업 수행
         for (Order order : orders) {
             OrderHisDto orderHisDto = new OrderHisDto(order); // 주문 → DTO
+
+            Member member = order.getMember();
+            log.info(member.toString());
 
             List<OrderItem> orderItems = order.getOrderItems(); // 주문 항목 목록 가져오기
 
@@ -129,5 +134,33 @@ public class OrderService {
 
         // 6. PageImpl 객체로 래핑하여 반환 (Pageable + 총개수 포함)
         return new PageImpl<>(orderHisDtoList, pageable, totalcount);
+    }
+
+    //email(로그인 사용자), orderId(주문번호)
+    public boolean validateOrder(Long orderId, String email) {
+
+        Member curmember = memberRepository.findByEmail(email);
+
+        Order order = orderRepository.findById(orderId).
+                orElseThrow(() -> new EntityNotFoundException());
+
+        Member savedmember = order.getMember();
+
+        if(!StringUtils.equals(curmember.getEmail(), savedmember.getEmail())) {
+            return false;
+        }
+        return true;
+    }
+
+
+
+
+
+    //주문 취소
+    public void cancelOrder(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new EntityNotFoundException());
+
+        order.cancelOrder();
     }
 }

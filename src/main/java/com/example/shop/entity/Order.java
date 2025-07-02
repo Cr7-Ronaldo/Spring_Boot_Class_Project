@@ -94,4 +94,12 @@ public class Order extends BaseEntity { // 등록일, 수정일, 등록자, 수�
         return totalPrice; // 총합 반환
     }
 
+    public void cancelOrder() {
+        orderStatus = OrderStatus.CANCEL;
+
+        for (OrderItem orderItem : orderItems) {
+            orderItem.cancle();
+        }
+    }
+
 }

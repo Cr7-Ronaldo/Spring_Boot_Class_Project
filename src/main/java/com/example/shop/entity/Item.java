@@ -91,4 +91,8 @@ public class Item extends BaseEntity { // BaseEntity: 등록일, 수정일, 등�
 
         this.stockNumber = restStock; // 재고 반영
     }
+
+    public void addStock(int stockNumber) {
+        this.stockNumber += stockNumber;
+    }
 }

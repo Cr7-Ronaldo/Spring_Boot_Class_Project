@@ -62,12 +62,18 @@ public class OrderItem extends BaseEntity { // BaseEntity로부터 등록일, �
         return orderItem;
     }
 
+    public void cancle(){
+        this.getItem().addStock(count);
+    }
+
+
     /**
      * 주문한 상품의 총 가격 계산
      * - 단가 × 수량
      */
     //주문할 때 마다 총합
     public int getTotalPrice() {
+
         return this.getOrderPrice() * this.count;
     }
 }
