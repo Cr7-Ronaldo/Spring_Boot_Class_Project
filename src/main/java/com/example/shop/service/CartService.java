@@ -1,5 +1,6 @@
 package com.example.shop.service;
 
+import com.example.shop.dto.CartDetailDto;
 import com.example.shop.dto.CartItemDto;
 import com.example.shop.entity.Cart;
 import com.example.shop.entity.CartItem;
@@ -14,6 +15,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,5 +61,22 @@ public class CartService {
             cartItemRepository.save(cartItem);
             return cartItem.getId();
         }
+    } //end addCart
+
+    @Transactional(readOnly = true)
+    public List<CartDetailDto> getCartList(String email) {
+
+        List<CartDetailDto> cartDetailDtoList = new ArrayList<>();
+
+        Member member = memberRepository.findByEmail(email);
+        Cart cart = cartRepository.findByMemberId(member.getId());
+
+        if(cart == null){
+            return cartDetailDtoList;
+        }
+
+        cartDetailDtoList = cartItemRepository.findCartDetailDtolist(cart.getId());
+
+        return cartDetailDtoList;
     }
 }

@@ -22,7 +22,7 @@
 "join ci.item i " +
 "where ci.cart.id = :cartId " +
 "and im.item.id = ci.item.id " +
-"and im.repimgYn == 'Y' " +
+"and im.repimgYn = 'Y' "
 "order by ci.regTime desc"
 )
 List<CartDetailDto> findCartDetatilDtolist(Long cartId);
@@ -35,7 +35,7 @@ join item i
 on ci.item_id = i.item_id
 join item_img im
 on i.item_id  = im.item_id
-where im.repimg_Yn = 'Y'
+where im.repimg_Yn = 'Y' and cart_id = ?
 order by ci.reg_time desc;
 </code></pre>
 
