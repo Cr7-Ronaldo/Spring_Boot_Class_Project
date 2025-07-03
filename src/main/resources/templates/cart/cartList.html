@@ -32,10 +32,13 @@
     }
 
     function changeCount(obj){
-      var count = obj.value;
-      var cartItemId = obj.id.split('_')[1];
-      var price = $("#price_" + cartItemId).data("price");
-      var totalPrice = count*price;
+      console.log(obj)
+      console.log(obj.id)
+
+      let count = obj.value;
+      let cartItemId = obj.id.split('_')[1];
+      let price = $("#price_" + cartItemId).data("price");
+      let totalPrice = count*price;
       $("#totalPrice_" + cartItemId).html(totalPrice+"원");
       getOrderTotalPrice();
       updateCartItemCount(cartItemId, count);
@@ -74,7 +77,7 @@
             alert('로그인 후 이용해주세요');
             location.href='/members/login';
           } else{
-            alert(jqXHR.responseJSON.message);
+            alert(jqXHR.responseText);
           }
 
         }
@@ -82,6 +85,10 @@
     }
 
     function deleteCartItem(obj){
+      console.log("delete......");
+      console.log(obj)
+      console.log(obj.dataset.id)
+
       var cartItemId = obj.dataset.id;
       /*  var token = $("meta[name='_csrf']").attr("content");
         var header = $("meta[name='_csrf_header']").attr("content");*/
@@ -106,7 +113,7 @@
             alert('로그인 후 이용해주세요');
             location.href='/members/login';
           } else{
-            alert(jqXHR.responseJSON.message);
+            alert(jqXHR.responseText);
           }
 
         }
@@ -154,7 +161,7 @@
             alert('로그인 후 이용해주세요');
             location.href='/members/login';
           } else{
-            alert(jqXHR.responseJSON.message);
+            alert(jqXHR.responseText);
           }
 
         }
@@ -236,7 +243,8 @@
                                        th:value="${cartItem.count}" min="1"
                                        onchange="changeCount(this)" class="form-control mr-2" >
                                 <button type="button" class="close" aria-label="Close">
-                                    <span aria-hidden="true" th:data-id="${cartItem.cartItemId}" onclick="deleteCartItem(this)">&times;</span>
+                                 <span class="bi bi-trash3" th:data-id="${cartItem.cartItemId}" onclick="deleteCartItem(this)"></span>
+
                                 </button>
                             </span>
             </div>
