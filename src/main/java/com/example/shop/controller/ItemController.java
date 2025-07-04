@@ -42,7 +42,7 @@ public class ItemController {
     public String itemNew(@Valid ItemFormDto itemFormDto,
                           BindingResult bindingResult,
                           @RequestParam("itemImgFile") List<MultipartFile> itemImgFileList
-                          ,Model model) {
+            ,Model model) {
 
         if(bindingResult.hasErrors()) {
             return "/item/itemForm";
@@ -109,21 +109,24 @@ public class ItemController {
     public String itemManage(ItemSearchDto itemSearchDto,
                              @PathVariable("page") Optional<Integer> page, Model model) {
 
+        log.info("-----------/admin/items or /admin/items/{page}------------");
         //전달 받은 page 값이 있으면 그 값을 사용하고, 전달 받은 페이지가 없으면
-        //1번 page, 3개 보여줘~
-        Pageable pageRequest = PageRequest.of(page.isPresent() ? page.get() : 0, 3);
+        //1번 page, 3개 보여쥬~
+        Pageable pageable = PageRequest.of(page.isPresent() ? page.get() : 0, 3);
 
-        Page<Item> items = itemService.getAdminItemPage(itemSearchDto, pageRequest);
+        Page<Item> items = itemService.getAdminItemPage(itemSearchDto, pageable);
 
         model.addAttribute("items", items);
         model.addAttribute("itemSearchDto", itemSearchDto);
         model.addAttribute("maxPage", 5);
 
-        return "item/itemMng";
+        return  "item/itemMng";
     }
 
     @GetMapping(value = "/item/{itemId}")
-    public String itemDtl2(@PathVariable Long itemId, Model model){
+    public String itemDtl2(@PathVariable Long itemId, Model model) {
+
+        log.info("itemDtl2 =========>  {}", itemId);
 
         ItemFormDto itemFormDto = itemService.getItemDtl(itemId);
 
